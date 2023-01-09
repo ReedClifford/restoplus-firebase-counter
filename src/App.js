@@ -1,25 +1,63 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+import { BiReset } from "react-icons/bi";
+import { FiMinus } from "react-icons/fi";
+import { IoAddSharp, IoLogoFirebase } from "react-icons/io5";
+import Button from "./components/Buttons";
+import Counter from "./components/Counter";
+import {
+  decrementValue,
+  getCurrentCountData,
+  incrementValue,
+  resetValue,
+} from "./utilities/firebaseUtils";
 
-function App() {
+const App = () => {
+  const [count, setCount] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchedData = async () => {
+      const { currentCount } = await getCurrentCountData();
+      setCount(currentCount);
+      setIsLoading(!isLoading);
+      console.log(count);
+    };
+    fetchedData();
+  }, [count]);
+
+  const decrementCountValue = async () => {
+    const updatedValue = await decrementValue();
+    setCount(updatedValue);
+  };
+  const incrementCountValue = async () => {
+    const updatedValue = await incrementValue();
+    setCount(updatedValue);
+  };
+  const resetedCountValue = async () => {
+    const updatedValue = await resetValue();
+    setCount(updatedValue);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <section className="main-container">
+      <div className="counter-container">
+        <h4 className="header">
+          FireBase Counter <IoLogoFirebase className="text-2xl" />
+        </h4>
+        <Counter currentCount={count} isLoading={isLoading} />
+        <div>
+          <Button className="buttons " onClick={() => decrementCountValue()}>
+            <FiMinus />
+          </Button>
+          <Button className="buttons " onClick={() => resetedCountValue()}>
+            <BiReset />
+          </Button>
+          <Button className="buttons " onClick={() => incrementCountValue()}>
+            <IoAddSharp />
+          </Button>
+        </div>
+      </div>
+    </section>
   );
-}
-
+};
 export default App;
